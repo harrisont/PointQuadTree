@@ -99,6 +99,7 @@ class PointQuadTreeViewer:
         print('\t{}: Remove collision-area points'.format(pygame.key.name(self._KEY_REMOVE_COLLISION_AREA_POINTS)))
         print('\t{}: Toggle subdivision display'.format(pygame.key.name(self._KEY_TOGGLE_SUBDIVISION_DISPLAY)))
         print('\t{}: Toggle collison lines'.format(pygame.key.name(self._KEY_TOGGLE_COLLISION_LINES)))
+        print('\t{}: Toggle point movement'.format(pygame.key.name(self._KEY_TOGGLE_POINT_MOVEMENT)))
         print('\t{}/{}: Decrease/increase random-point insertion-rate'.format(
             pygame.key.name(self._KEY_RANDOM_POINT_INSERTION_RATE_DECREASE),
             pygame.key.name(self._KEY_RANDOM_POINT_INSERTION_RATE_INCREASE)))

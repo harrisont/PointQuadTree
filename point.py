@@ -2,6 +2,11 @@ import math
 
 class Point:
     def __init__(self, x, y):
+        """
+        >>> p = Point(0, 0)
+        >>> (p.x, p.y)
+        (0, 0)
+        """
         self.x = x
         self.y = y
 
@@ -51,7 +56,18 @@ class Point:
         """
         return (self.x - other_point.x)**2 + (self.y - other_point.y)**2
 
-
+    def translate(self, x, y):
+        """
+        >>> p = Point(0, 0)
+        >>> p.translate(1, -2)
+        >>> (p.x, p.y)
+        (1, -2)
+        >>> p.translate(0, 0)
+        >>> (p.x, p.y)
+        (1, -2)
+        """
+        self.x += x
+        self.y += y
 
     def __lt__(self, other):
         """

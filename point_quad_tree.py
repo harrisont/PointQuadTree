@@ -304,9 +304,10 @@ class PointQuadTree:
             self._remove_from_self(point)
             return True
         elif self._has_subdivided():
-            removed_point = self._remove_from_subtree(point)
-            self._remove_empty_subtrees()
-            return removed_point
+            point_was_removed = self._remove_from_subtree(point)
+            if point_was_removed:
+                self._remove_empty_subtrees()
+            return point_was_removed
         else:
             return False
 

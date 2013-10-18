@@ -21,6 +21,11 @@ def sign(x):
     else:
         return -1
 
+class MovingPoint(Point):
+    def __init__(self, x, y):
+        super().__init__(x, y)
+        self.velocity = Point(0, 0)
+
 class PointQuadTreeViewer:
     """
     Displays a PointQuadTree
@@ -48,6 +53,7 @@ class PointQuadTreeViewer:
     _KEY_TOGGLE_SUBDIVISION_DISPLAY = pygame.K_SPACE
     _KEY_RANDOM_POINT_INSERTION_RATE_DECREASE = pygame.K_j
     _KEY_RANDOM_POINT_INSERTION_RATE_INCREASE = pygame.K_k
+    _KEY_TOGGLE_POINT_MOVEMENT = pygame.K_m
     _KEY_REMOVE_COLLISION_AREA_POINTS = pygame.K_BACKSPACE
 
     def __init__(self, point_quad_tree):
@@ -70,9 +76,9 @@ class PointQuadTreeViewer:
         self._collision_area_points = []
         self._mouse_point = None
         self._collision_area_radius = self._COLLISION_AREA_RADIUS_INITIAL
-
         self._collision_lines_visible = True
         self._subdivisions_visible = True
+        self._has_point_movement = True
 
     def run(self):
         self.print_controls()
@@ -133,12 +139,14 @@ class PointQuadTreeViewer:
                     self._change_random_point_insertion_rate(1)
                 elif event.key == self._KEY_REMOVE_COLLISION_AREA_POINTS:
                     self._remove_collision_area_points()
+                elif event.key == self._KEY_TOGGLE_POINT_MOVEMENT:
+                    self._has_point_movement = not self._has_point_movement
             elif event.type == pygame.MOUSEMOTION:
                 mouse_x, mouse_y = event.pos
                 self._update_mouse_position(Point(mouse_x, mouse_y))
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
-                self._add_point(Point(mouse_x, mouse_y))
+                self._add_point(MovingPoint(mouse_x, mouse_y))
 
     def _update_mouse_position(self, mouse_point):
         """
@@ -185,7 +193,7 @@ class PointQuadTreeViewer:
         if not self._get_points():
             self._set_random_point_insertion_rate(0)
 
-    def _tick(self):
+    def _tick_point_insertion(self):
         self._random_point_insertion_accumulator += self._random_point_insertion_rate
         while abs(self._random_point_insertion_accumulator) >= 1:
             step = sign(self._random_point_insertion_accumulator)
@@ -195,10 +203,35 @@ class PointQuadTreeViewer:
             else:
                 self._remove_random_point()
 
+    def _tick_point_movement(self):
+        if self._has_point_movement:
+            for point in self._get_points():
+                self._move_point(point)
+
+    def _move_point(self, point):
+        self._tree.remove(point)
+        point.translate_by_point(point.velocity)
+
+        # Only re-add the point if it still in bounds
+        if self._tree.boundary.contains(point):
+            self._tree.insert(point)
+        else:
+            self._stop_removing_points_if_none_are_left()
+
+        self._update_mouse_collision_area_points()
+
+    def _tick(self):
+        self._tick_point_insertion()
+        self._tick_point_movement()
+
     def _add_random_point(self):
         x = random.randint(self._tree.boundary.x_min(), self._tree.boundary.x_max())
         y = random.randint(self._tree.boundary.y_min(), self._tree.boundary.y_max())
-        self._add_point(Point(x, y))
+        point = MovingPoint(x, y)
+
+        point.velocity.translate(random.randint(-5, 5), random.randint(-5, 5))
+
+        self._add_point(point)
 
     def _add_point(self, point):
         self._tree.insert(point)

@@ -69,6 +69,15 @@ class Point:
         self.x += x
         self.y += y
 
+    def translate_by_point(self, other):
+        """
+        >>> p = Point(0, 0)
+        >>> p.translate_by_point(Point(1, -2))
+        >>> (p.x, p.y)
+        (1, -2)
+        """
+        self.translate(other.x, other.y)
+
     def __lt__(self, other):
         """
         >>> Point(1, 0) < Point(0, 2)

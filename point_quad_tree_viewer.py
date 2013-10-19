@@ -115,8 +115,7 @@ class PointQuadTreeViewer:
         """
         @return (boundary_width, boundary_height)
         """
-        half_size = self._tree.boundary.half_size
-        return (int(2*half_size.x), int(2*half_size.y))
+        return (int(2*self._tree.boundary.half_size_x), int(2*self._tree.boundary.half_size_y))
 
     def _handle_events(self):
         for event in pygame.event.get():
@@ -255,7 +254,8 @@ class PointQuadTreeViewer:
     def _get_collision_boundary(self, point):
         return AxisAlignedBoundingBox(
             center=point,
-            half_size=Point(self._collision_area_radius, self._collision_area_radius))
+            half_size_x=self._collision_area_radius,
+            half_size_y=self._collision_area_radius)
 
     def _draw(self):
         self.screen.fill(self._BACKGROUND_COLOR)
@@ -365,7 +365,7 @@ def main():
     Animate a PointQuadTree as points are added to it.
     """
     boundary_half_size = Point(BOUNDARY_WIDTH/2, BOUNDARY_HEIGHT/2)
-    boundary = AxisAlignedBoundingBox(center=boundary_half_size, half_size=boundary_half_size)
+    boundary = AxisAlignedBoundingBox(center=boundary_half_size, half_size_x=boundary_half_size.x, half_size_y=boundary_half_size.y)
     tree = DiagnosticPointQuadTree(boundary=boundary, node_capacity=QUAD_TREE_NODE_CAPACITY)
 
     view_point_quad_tree(tree)

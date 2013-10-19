@@ -69,6 +69,9 @@ class Point:
         self.x += x
         self.y += y
 
+    def get_translated_point(self, x, y):
+        return Point(self.x + x, self.y + y)
+
     def translate_by_point(self, other):
         """
         >>> p = Point(0, 0)

@@ -210,15 +210,9 @@ class PointQuadTreeViewer:
                 self._move_point(point)
 
     def _move_point(self, point):
-        self._tree.remove(point)
-        point.translate_by_point(point.velocity)
-
-        # Only re-add the point if it still in bounds
-        if self._tree.boundary.contains(point):
-            self._tree.insert(point)
-        else:
+        translate_result = self._tree.translate_point(point, point.velocity.x, point.velocity.y)
+        if translate_result == PointQuadTree.TranslatePointResult.removed:
             self._stop_removing_points_if_none_are_left()
-
         self._update_mouse_collision_area_points()
 
     def _tick(self):
@@ -230,7 +224,11 @@ class PointQuadTreeViewer:
         y = random.randint(self._tree.boundary.y_min(), self._tree.boundary.y_max())
         point = MovingPoint(x, y)
 
-        point.velocity.translate(random.randint(-5, 5), random.randint(-5, 5))
+        vx_sign = (2 * random.randint(0, 1)) - 1
+        vx = random.uniform(1, 5) * vx_sign
+        vy_sign = (2 * random.randint(0, 1)) - 1
+        vy = random.uniform(1, 5) * vy_sign
+        point.velocity.translate(vx, vy)
 
         self._add_point(point)
 
@@ -282,7 +280,7 @@ class PointQuadTreeViewer:
         """
         @param point Point
         """
-        pygame.draw.circle(self.screen, color, (point.x, point.y), self._POINT_RADIUS)
+        pygame.draw.circle(self.screen, color, (round(point.x), round(point.y)), self._POINT_RADIUS)
 
     def _draw_collision_area_and_points(self, color):
         # Highlight the area near the mouse location.

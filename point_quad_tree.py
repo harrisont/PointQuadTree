@@ -311,6 +311,98 @@ class PointQuadTree:
         else:
             return False
 
+    class TranslatePointResult:
+        translated = 1
+        out_of_bounds = 2
+        not_in_tree = 3
+        removed = 4
+
+    def translate_point(self, point, x, y):
+        """
+        This has the same behavior as, but is more efficient than, removing the point and then
+        re-adding it at the new location.
+
+        If the translated position is outside the tree's boundary, the point will be removed.
+
+        @param point Point
+        @param x, y Number The amount to translate the point by.
+        @return TranslatePointResult
+
+        Attempt to translate a point not in the tree:
+        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center=Point(0, 0), half_size=Point(1, 1)), node_capacity=1)
+        >>> tree.translate_point(Point(0, 0), x=1, y=1) == PointQuadTree.TranslatePointResult.not_in_tree
+        True
+
+        Attempt to translate an out of bounds point:
+        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center=Point(0, 0), half_size=Point(1, 1)), node_capacity=1)
+        >>> tree.translate_point(Point(2, 2), x=1, y=1) == PointQuadTree.TranslatePointResult.out_of_bounds
+        True
+
+        Translate a point to a new position in the same node:
+        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center=Point(0, 0), half_size=Point(2, 2)), node_capacity=1)
+        >>> p1 = Point(1, 1)
+        >>> tree.insert(p1)
+        True
+        >>> tree.translate_point(p1, 1, 1) == PointQuadTree.TranslatePointResult.translated
+        True
+        >>> tree.get_all_points()
+        [(2,2)]
+        >>> tree._has_subdivided()
+        False
+
+        Translate a point such that its new position is out of the tree:
+        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center=Point(0, 0), half_size=Point(1, 1)), node_capacity=1)
+        >>> p1 = Point(1, 1)
+        >>> tree.insert(p1)
+        True
+        >>> tree.translate_point(p1, 1, 1) == PointQuadTree.TranslatePointResult.removed
+        True
+        >>> tree.get_all_points()
+        []
+
+        Translate a deep point:
+        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center=Point(0, 0), half_size=Point(3, 3)), node_capacity=1)
+        >>> p1 = Point(1, 1)
+        >>> p2 = Point(2, 2)
+        >>> p3 = Point(3, 3)
+        >>> tree.insert(p1)
+        True
+        >>> tree.insert(p2)
+        True
+        >>> tree.insert(p3)
+        True
+        >>> tree.translate_point(p3, -6, -6) == PointQuadTree.TranslatePointResult.translated
+        True
+        >>> tree.get_all_points()
+        [(1,1), (2,2), (-3,-3)]
+
+        Translate a deep point such that its new position is out of the tree:
+        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center=Point(0, 0), half_size=Point(3, 3)), node_capacity=1)
+        >>> p1 = Point(1, 1)
+        >>> p2 = Point(2, 2)
+        >>> p3 = Point(3, 3)
+        >>> tree.insert(p1)
+        True
+        >>> tree.insert(p2)
+        True
+        >>> tree.insert(p3)
+        True
+        >>> tree.translate_point(p3, 1, 1) == PointQuadTree.TranslatePointResult.removed
+        True
+        >>> tree.get_all_points()
+        [(1,1), (2,2)]
+        """
+        assert point
+
+        if not self.boundary.contains(point):
+            return PointQuadTree.TranslatePointResult.out_of_bounds
+        elif point in self._points:
+            return self._translate_point_in_self(point, x, y)
+        elif self._has_subdivided():
+            return self._translate_point_in_subtree(point, x, y)
+        else:
+            return PointQuadTree.TranslatePointResult.not_in_tree
+
     def _remove_from_self(self, point):
         """
         Remove point from this node and bubble up a point from a subtree
@@ -375,6 +467,39 @@ class PointQuadTree:
             return self._points.pop(0)
         else:
             return None
+
+    def _translate_point_in_self(self, point, x, y):
+        if self.boundary.contains(point.get_translated_point(x, y)):
+            point.translate(x, y)
+            return PointQuadTree.TranslatePointResult.translated
+        else:
+            self.remove(point)
+            self._remove_empty_subtrees()
+            point.translate(x, y)
+            return PointQuadTree.TranslatePointResult.removed
+
+    def _translate_point_in_subtree(self, point, x, y):
+        for subtree in self._subtree_iterator():
+            translate_result = subtree.translate_point(point, x, y)
+            if translate_result == PointQuadTree.TranslatePointResult.out_of_bounds:
+                # Continue on to the next subtree.
+                continue
+            elif (translate_result == PointQuadTree.TranslatePointResult.translated or
+                translate_result == PointQuadTree.TranslatePointResult.not_in_tree):
+                return translate_result
+            elif translate_result == PointQuadTree.TranslatePointResult.removed:
+                # The point is already translated.
+                if self.boundary.contains(point):
+                    self.insert(point)
+                    return PointQuadTree.TranslatePointResult.translated
+                else:
+                    return PointQuadTree.TranslatePointResult.removed
+            else:
+                # All the TranslatePointResult values should have been handled.
+                assert false
+
+        # The point was not found in any of the subtrees.
+        return PointQuadTree.TranslatePointResult.not_in_tree
 
     def _remove_empty_subtrees(self):
         if not self._has_subtree_points():

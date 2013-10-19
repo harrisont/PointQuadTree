@@ -149,7 +149,7 @@ class PointQuadTree:
 
         # Query the points in this immediate tree.
         for point in self._points:
-            if region.contains(point):
+            if region.contains_point(point):
                 points_in_region.append(point)
 
         # Query the subtrees.
@@ -192,7 +192,7 @@ class PointQuadTree:
         >>> any((subtree._has_subdivided() for subtree in tree._subtree_iterator()))
         False
         """
-        if not self.boundary.contains(point):
+        if not self.boundary.contains_point(point):
             return False
 
         if len(self._points) < self._node_capacity:
@@ -297,7 +297,7 @@ class PointQuadTree:
         """
         assert point
 
-        if not self.boundary.contains(point):
+        if not self.boundary.contains_point(point):
             return False
 
         if point in self._points:
@@ -394,7 +394,7 @@ class PointQuadTree:
         """
         assert point
 
-        if not self.boundary.contains(point):
+        if not self.boundary.contains_point(point):
             return PointQuadTree.TranslatePointResult.out_of_bounds
         elif point in self._points:
             return self._translate_point_in_self(point, x, y)
@@ -469,7 +469,7 @@ class PointQuadTree:
             return None
 
     def _translate_point_in_self(self, point, x, y):
-        if self.boundary.contains(point.get_translated_point(x, y)):
+        if self.boundary.contains(point.x + x, point.y + y):
             point.translate(x, y)
             return PointQuadTree.TranslatePointResult.translated
         else:
@@ -489,7 +489,7 @@ class PointQuadTree:
                 return translate_result
             elif translate_result == PointQuadTree.TranslatePointResult.removed:
                 # The point is already translated.
-                if self.boundary.contains(point):
+                if self.boundary.contains_point(point):
                     self.insert(point)
                     return PointQuadTree.TranslatePointResult.translated
                 else:

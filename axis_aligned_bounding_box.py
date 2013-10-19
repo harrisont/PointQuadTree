@@ -35,48 +35,51 @@ class AxisAlignedBoundingBox:
     def y_max(self):
         return self.center.y + self.half_size.y
 
-    def contains(self, point):
+    def contains_point(self, point):
+        return self.contains(point.x, point.y)
+
+    def contains(self, x, y):
         """
         >>> box = AxisAlignedBoundingBox(Point(0, 0), Point(2, 2))
 
         Contains center:
-        >>> box.contains(box.center)
+        >>> box.contains(box.center.x, box.center.y)
         True
 
         Does not contain:
-        >>> box.contains(Point(3, 0))
+        >>> box.contains(3, 0)
         False
 
         Contains a point on the left edge:
-        >>> box.contains(Point(-2, 0))
+        >>> box.contains(-2, 0)
         True
 
         Contains a point on the right edge:
-        >>> box.contains(Point(2, 0))
+        >>> box.contains(2, 0)
         True
 
         Contains a point on the top edge:
-        >>> box.contains(Point(0, 2))
+        >>> box.contains(0, 2)
         True
 
         Contains a point on the bottom edge:
-        >>> box.contains(Point(0, -2))
+        >>> box.contains(0, -2)
         True
 
         Contains a point on the upper-left corner:
-        >>> box.contains(Point(-2, 2))
+        >>> box.contains(-2, 2)
         True
 
         Contains a point on the upper-right corner:
-        >>> box.contains(Point(2, 2))
+        >>> box.contains(2, 2)
         True
 
         Contains a point on the lower-left corner:
-        >>> box.contains(Point(-2, -2))
+        >>> box.contains(-2, -2)
         True
 
         Contains a point on the lower-right corner:
-        >>> box.contains(Point(2, -2))
+        >>> box.contains(2, -2)
         True
         """
         x_min = self.center.x - self.half_size.x
@@ -85,8 +88,8 @@ class AxisAlignedBoundingBox:
         y_max = self.center.y + self.half_size.y
 
         return (
-            (x_min <= point.x <= x_max) and
-            (y_min <= point.y <= y_max))
+            (x_min <= x <= x_max) and
+            (y_min <= y <= y_max))
 
     def intersects(self, other):
         """

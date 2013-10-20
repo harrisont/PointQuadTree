@@ -253,7 +253,8 @@ class PointQuadTreeViewer:
 
     def _get_collision_boundary(self, point):
         return AxisAlignedBoundingBox(
-            center=point,
+            center_x=point.x,
+            center_y=point.y,
             half_size_x=self._collision_area_radius,
             half_size_y=self._collision_area_radius)
 
@@ -296,13 +297,15 @@ class PointQuadTreeViewer:
         @param axis_aligned_bounding_box AxisAlignedBoundingBox
         @border_thickness Integer The border thickness.  Fills if the value is 0.
         """
-        center = axis_aligned_bounding_box.center
-        half_size = axis_aligned_bounding_box.half_size
+        center_x = axis_aligned_bounding_box.center_x
+        center_y = axis_aligned_bounding_box.center_y
+        half_size_x = axis_aligned_bounding_box.half_size_y
+        half_size_y = axis_aligned_bounding_box.half_size_y
         rect = (
-            center.x - half_size.x,
-            center.y - half_size.y,
-            2 * half_size.x,
-            2 * half_size.y)
+            center_x - half_size_x,
+            center_y - half_size_y,
+            2 * half_size_x,
+            2 * half_size_y)
 
         pygame.draw.rect(self.screen, color, rect, border_thickness)
 
@@ -313,9 +316,10 @@ class PointQuadTreeViewer:
         if not tree._has_subdivided():
             return
 
-        center = tree.boundary.center
-        pygame.draw.line(self.screen, color, (tree.boundary.x_min(), center.y), (tree.boundary.x_max(), center.y))
-        pygame.draw.line(self.screen, color, (center.x, tree.boundary.y_min()), (center.x, tree.boundary.y_max()))
+        center_x = tree.boundary.center_x
+        center_y = tree.boundary.center_y
+        pygame.draw.line(self.screen, color, (tree.boundary.x_min(), center_y), (tree.boundary.x_max(), center_y))
+        pygame.draw.line(self.screen, color, (center_x, tree.boundary.y_min()), (center_x, tree.boundary.y_max()))
 
         for subtree in tree._subtree_iterator():
             self._draw_tree_partitions_helper(subtree, color)
@@ -365,7 +369,11 @@ def main():
     Animate a PointQuadTree as points are added to it.
     """
     boundary_half_size = Point(BOUNDARY_WIDTH/2, BOUNDARY_HEIGHT/2)
-    boundary = AxisAlignedBoundingBox(center=boundary_half_size, half_size_x=boundary_half_size.x, half_size_y=boundary_half_size.y)
+    boundary = AxisAlignedBoundingBox(
+        center_x=boundary_half_size.x,
+        center_y=boundary_half_size.y,
+        half_size_x=boundary_half_size.x,
+        half_size_y=boundary_half_size.y)
     tree = DiagnosticPointQuadTree(boundary=boundary, node_capacity=QUAD_TREE_NODE_CAPACITY)
 
     view_point_quad_tree(tree)

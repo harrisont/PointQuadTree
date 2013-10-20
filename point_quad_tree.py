@@ -29,7 +29,7 @@ class PointQuadTree:
     See http://en.wikipedia.org/wiki/Quadtree#Point_quadtree for more information.
 
     Create a tree whose boundary's lower-left is (0,-4) and lower-right is (16,4).
-    >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center=Point(8, 0), half_size_x=8, half_size_y=4), node_capacity=2)
+    >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center_x=8, center_y=0, half_size_x=8, half_size_y=4), node_capacity=2)
     >>> tree.boundary
     AABB<center=(8,0), half_size=(8,4)>
 
@@ -61,7 +61,7 @@ class PointQuadTree:
     [(7,1), (9,1)]
 
     Size-8 box centered on the origin query:
-    >>> tree.query_points_in_region(AxisAlignedBoundingBox(center=Point(0, 0), half_size_x=8, half_size_y=8))
+    >>> tree.query_points_in_region(AxisAlignedBoundingBox(center_x=0, center_y=0, half_size_x=8, half_size_y=8))
     [(7,1), (7,-1)]
 
     You can add any type that conforms to the Point interface:
@@ -73,20 +73,20 @@ class PointQuadTree:
     ...
     ...     def __repr__(self):
     ...         return "{}:({},{})".format(self.name, self.x, self.y)
-    >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center=Point(0, 0), half_size_x=2, half_size_y=2), node_capacity=1)
+    >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center_x=0, center_y=0, half_size_x=2, half_size_y=2), node_capacity=1)
     >>> obj1 = ClassImplementingPointInterface(0, 0, 'obj1')
     >>> obj2 = ClassImplementingPointInterface(2, 2, 'obj2')
     >>> tree.insert(obj1)
     True
     >>> tree.insert(obj2)
     True
-    >>> tree.query_points_in_region(AxisAlignedBoundingBox(center=Point(0, 0), half_size_x=2, half_size_y=2))
+    >>> tree.query_points_in_region(AxisAlignedBoundingBox(center_x=0, center_y=0, half_size_x=2, half_size_y=2))
     [obj1:(0,0), obj2:(2,2)]
     >>> tree.remove(ClassImplementingPointInterface(0, 0, 'obj1'))  # Points must be equal to be removed.
     False
     >>> tree.remove(obj1)
     True
-    >>> tree.query_points_in_region(AxisAlignedBoundingBox(center=Point(0, 0), half_size_x=2, half_size_y=2))
+    >>> tree.query_points_in_region(AxisAlignedBoundingBox(center_x=0, center_y=0, half_size_x=2, half_size_y=2))
     [obj2:(2,2)]
     >>> tree.remove(obj1)  # Removing a point twice will fail.
     False
@@ -113,7 +113,7 @@ class PointQuadTree:
         """
         @return an array of all Point's contained in this tree
 
-        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center=Point(0, 0), half_size_x=3, half_size_y=3), node_capacity=1)
+        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center_x=0, center_y=0, half_size_x=3, half_size_y=3), node_capacity=1)
         >>> tree.get_all_points()
         []
         >>> tree.insert(Point(1, 1))
@@ -164,7 +164,7 @@ class PointQuadTree:
         @param point Point
         @return True if the point was inserted, false otherwise (if the point is not in the tree's region)
 
-        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center=Point(0, 0), half_size_x=2, half_size_y=2), node_capacity=1)
+        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center_x=0, center_y=0, half_size_x=2, half_size_y=2), node_capacity=1)
 
         A tree with a node_capacity of will subdivide after 2 insertions.
         >>> p1 = Point(1, 1)
@@ -211,7 +211,7 @@ class PointQuadTree:
 
     def clear(self):
         """
-        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center=Point(0, 0), half_size_x=2, half_size_y=2), node_capacity=1)
+        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center_x=0, center_y=0, half_size_x=2, half_size_y=2), node_capacity=1)
         >>> p1 = Point(1, 1)
         >>> p2 = Point(2, 2)
         >>> tree.insert(p1)
@@ -231,7 +231,7 @@ class PointQuadTree:
         @return True if the point was removed, false otherwise (if the point is not in the tree)
 
         First add two points and remove the first...
-        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center=Point(0, 0), half_size_x=2, half_size_y=2), node_capacity=1)
+        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center_x=0, center_y=0, half_size_x=2, half_size_y=2), node_capacity=1)
         >>> p1 = Point(1, 1)
         >>> p2 = Point(2, 2)
         >>> tree.insert(p1)
@@ -329,17 +329,17 @@ class PointQuadTree:
         @return TranslatePointResult
 
         Attempt to translate a point not in the tree:
-        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center=Point(0, 0), half_size_x=1, half_size_y=1), node_capacity=1)
+        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center_x=0, center_y=0, half_size_x=1, half_size_y=1), node_capacity=1)
         >>> tree.translate_point(Point(0, 0), x=1, y=1) == PointQuadTree.TranslatePointResult.not_in_tree
         True
 
         Attempt to translate an out of bounds point:
-        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center=Point(0, 0), half_size_x=1, half_size_y=1), node_capacity=1)
+        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center_x=0, center_y=0, half_size_x=1, half_size_y=1), node_capacity=1)
         >>> tree.translate_point(Point(2, 2), x=1, y=1) == PointQuadTree.TranslatePointResult.out_of_bounds
         True
 
         Translate a point to a new position in the same node:
-        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center=Point(0, 0), half_size_x=2, half_size_y=2), node_capacity=1)
+        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center_x=0, center_y=0, half_size_x=2, half_size_y=2), node_capacity=1)
         >>> p1 = Point(1, 1)
         >>> tree.insert(p1)
         True
@@ -351,7 +351,7 @@ class PointQuadTree:
         False
 
         Translate a point such that its new position is out of the tree:
-        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center=Point(0, 0), half_size_x=1, half_size_y=1), node_capacity=1)
+        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center_x=0, center_y=0, half_size_x=1, half_size_y=1), node_capacity=1)
         >>> p1 = Point(1, 1)
         >>> tree.insert(p1)
         True
@@ -361,7 +361,7 @@ class PointQuadTree:
         []
 
         Translate a deep point:
-        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center=Point(0, 0), half_size_x=3, half_size_y=3), node_capacity=1)
+        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center_x=0, center_y=0, half_size_x=3, half_size_y=3), node_capacity=1)
         >>> p1 = Point(1, 1)
         >>> p2 = Point(2, 2)
         >>> p3 = Point(3, 3)
@@ -377,7 +377,7 @@ class PointQuadTree:
         [(1,1), (2,2), (-3,-3)]
 
         Translate a deep point such that its new position is out of the tree:
-        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center=Point(0, 0), half_size_x=3, half_size_y=3), node_capacity=1)
+        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center_x=0, center_y=0, half_size_x=3, half_size_y=3), node_capacity=1)
         >>> p1 = Point(1, 1)
         >>> p2 = Point(2, 2)
         >>> p3 = Point(3, 3)
@@ -524,7 +524,7 @@ class PointQuadTree:
         @param factor_x Number {-1, 1}
         @param factor_y Number {-1, 1}
 
-        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center=Point(1, 0), half_size_x=2, half_size_y=2), node_capacity=1)
+        >>> tree = PointQuadTree(boundary=AxisAlignedBoundingBox(center_x=1, center_y=0, half_size_x=2, half_size_y=2), node_capacity=1)
         >>> tree._calculate_subdivision_boundary(1, 1)
         AABB<center=(2.0,1.0), half_size=(1.0,1.0)>
         >>> tree._calculate_subdivision_boundary(-1, -1)
@@ -532,18 +532,9 @@ class PointQuadTree:
         """
         subdivision_half_size_x = self.boundary.half_size_x / 2
         subdivision_half_size_y = self.boundary.half_size_y / 2
-        subdivision_center = self._calculate_subdivision_center(subdivision_half_size_x, subdivision_half_size_y, factor_x, factor_y)
-        return AxisAlignedBoundingBox(subdivision_center, subdivision_half_size_x, subdivision_half_size_y)
-
-    def _calculate_subdivision_center(self, subdivision_half_size_x, subdivision_half_size_y, factor_x, factor_y):
-        """
-        @param subdivision_half_size Number
-        @param factor_x Number {-1, 1}
-        @param factor_y Number {-1, 1}
-        """
-        return Point(
-            self.boundary.center.x + (factor_x * subdivision_half_size_x),
-            self.boundary.center.y + (factor_y * subdivision_half_size_y))
+        subdivision_center_x = self.boundary.center_x + (factor_x * subdivision_half_size_x)
+        subdivision_center_y = self.boundary.center_y + (factor_y * subdivision_half_size_y)
+        return AxisAlignedBoundingBox(subdivision_center_x, subdivision_center_y, subdivision_half_size_x, subdivision_half_size_y)
 
     def _has_subdivided(self):
         return any(self._subtree_iterator())

@@ -99,6 +99,10 @@ class Point:
         return self.y < other.y
 
     def __repr__(self):
+        """
+        >>> repr(Point(1, 2))
+        '(1,2)'
+        """
         return "({},{})".format(self.x, self.y)
 
 def run_tests():

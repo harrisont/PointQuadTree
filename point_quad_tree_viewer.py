@@ -74,7 +74,8 @@ class PointQuadTreeViewer:
         self._random_point_insertion_accumulator = 0
 
         self._collision_area_points = []
-        self._mouse_point = None
+        self._mouse_x = 0
+        self._mouse_y = 0
         self._collision_area_radius = self._COLLISION_AREA_RADIUS_INITIAL
         self._collision_lines_visible = True
         self._subdivisions_visible = True
@@ -143,28 +144,27 @@ class PointQuadTreeViewer:
                     self._has_point_movement = not self._has_point_movement
             elif event.type == pygame.MOUSEMOTION:
                 mouse_x, mouse_y = event.pos
-                self._update_mouse_position(Point(mouse_x, mouse_y))
+                self._update_mouse_position(mouse_x, mouse_y)
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
                 self._add_point(MovingPoint(mouse_x, mouse_y))
 
-    def _update_mouse_position(self, mouse_point):
+    def _update_mouse_position(self, mouse_x, mouse_y):
         """
         @param mouse_point Point
         """
-        self._mouse_point = mouse_point
+        self._mouse_x = mouse_x
+        self._mouse_y = mouse_y
         self._update_mouse_collision_area_points()
 
     def _update_mouse_collision_area_points(self):
-        if not self._mouse_point:
-            return
-        self._collision_area_points = self._get_points_in_collision_area_for_point(self._mouse_point)
+        self._collision_area_points = self._get_points_in_collision_area_for_point(self._mouse_x, self._mouse_y)
 
-    def _get_points_in_collision_area_for_point(self, point):
+    def _get_points_in_collision_area_for_point(self, x, y):
         """
         @return iteratable(Point) the points in point's collision area
         """
-        region = self._get_collision_boundary(point)
+        region = self._get_collision_boundary(x, y)
         return self._tree.query_points_in_region(region)
 
     def _grow_collision_area(self, amount):
@@ -249,12 +249,12 @@ class PointQuadTreeViewer:
         self._stop_removing_points_if_none_are_left()
 
     def _get_mouse_collision_boundary(self):
-        return self._get_collision_boundary(self._mouse_point)
+        return self._get_collision_boundary(self._mouse_x, self._mouse_y)
 
-    def _get_collision_boundary(self, point):
+    def _get_collision_boundary(self, x, y):
         return AxisAlignedBoundingBox(
-            center_x=point.x,
-            center_y=point.y,
+            center_x=x,
+            center_y=y,
             half_size_x=self._collision_area_radius,
             half_size_y=self._collision_area_radius)
 
@@ -285,8 +285,7 @@ class PointQuadTreeViewer:
 
     def _draw_collision_area_and_points(self, color):
         # Highlight the area near the mouse location.
-        if self._mouse_point:
-            self._draw_boundry(color, self._get_mouse_collision_boundary(), border_thickness=1)
+        self._draw_boundry(color, self._get_mouse_collision_boundary(), border_thickness=1)
 
         # Highlight points near the mouse location.
         for point in self._collision_area_points:
@@ -339,7 +338,7 @@ class PointQuadTreeViewer:
 
     def _draw_collision_lines(self, color):
         for point in self._get_points():
-            collision_area_points = self._get_points_in_collision_area_for_point(point)
+            collision_area_points = self._get_points_in_collision_area_for_point(point.x, point.y)
             for other_point in collision_area_points:
                 pygame.draw.line(self.screen, color, (point.x, point.y), (other_point.x, other_point.y), self._POINT_RADIUS)
 

@@ -223,13 +223,16 @@ class PointQuadTreeViewer:
         y = random.randint(self._tree.boundary.y_min(), self._tree.boundary.y_max())
         point = MovingPoint(x, y)
 
-        vx_sign = (2 * random.randint(0, 1)) - 1
-        vx = random.uniform(1, 5) * vx_sign
-        vy_sign = (2 * random.randint(0, 1)) - 1
-        vy = random.uniform(1, 5) * vy_sign
+        vx = self._get_random_nonzero_mirrored_number(1, 5)
+        vy = self._get_random_nonzero_mirrored_number(1, 5)
         point.velocity.translate(vx, vy)
 
         self._add_point(point)
+
+    @staticmethod
+    def _get_random_nonzero_mirrored_number(absolute_min, absolute_max):
+        sign = (2 * random.randint(0, 1)) - 1
+        return random.uniform(absolute_min, absolute_max) * sign
 
     def _add_point(self, point):
         self._tree.insert(point)

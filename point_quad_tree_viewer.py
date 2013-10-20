@@ -1,4 +1,3 @@
-# TODO: Add motion to the points.
 # TODO: Add the ability to save/load the current viewer state.
 # TODO: Add the ability to change the node-capacity (rebuilding the tree).
 # TODO: Add the ability to profile running one iteration of the current main loop.

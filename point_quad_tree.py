@@ -1,8 +1,3 @@
-# TODO: Optimization: add a method to move a point.
-#       Currently, a point can be moved by removing it and then re-adding it,
-#       but this is unnecessary if the new location is still inside the tree
-#       that contains the point
-
 # TODO: Optimization: add an option to have the tree store all its points in leaf nodes.
 
 # TODO: Add cached PointQuadTree, which caches the result of:

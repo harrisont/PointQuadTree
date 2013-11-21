@@ -203,9 +203,8 @@ class PointQuadTreeViewer:
                 self._remove_random_point()
 
     def _tick_point_movement(self):
-        if self._has_point_movement:
-            for point in self._get_points():
-                self._move_point(point)
+        for point in self._get_points():
+            self._move_point(point)
 
     def _move_point(self, point):
         translate_result = self._tree.translate_point(point, point.velocity.x, point.velocity.y)
@@ -215,7 +214,8 @@ class PointQuadTreeViewer:
 
     def _tick(self):
         self._tick_point_insertion()
-        self._tick_point_movement()
+        if self._has_point_movement:
+            self._tick_point_movement()
 
     def _add_random_point(self):
         x = random.randint(self._tree.boundary.x_min(), self._tree.boundary.x_max())

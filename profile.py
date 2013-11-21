@@ -55,7 +55,10 @@ class PointQuadTreeProfileRunner:
 
     def _query_all_points(self):
         for point in self._get_points():
-            point_region = AxisAlignedBoundingBox(center=point, half_size=Point(POINT_HALF_SIZE, POINT_HALF_SIZE))
+            point_region = AxisAlignedBoundingBox(center_x=point.x,
+                                                  center_y=point.y,
+                                                  half_size_x=POINT_HALF_SIZE,
+                                                  half_size_y=POINT_HALF_SIZE)
             self._tree.query_points_in_region(point_region)
 
     def _get_points(self):

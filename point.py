@@ -56,6 +56,24 @@ class Point:
         """
         return (self.x - other_point.x)**2 + (self.y - other_point.y)**2
 
+    def difference(self, other_point):
+        """
+        >>> Point(2, 5).difference(Point(1, 2))
+        (1,3)
+        """
+        return Point(self.x - other_point.x, self.y - other_point.y)
+
+    def direction_from(self, other_point):
+        """
+        Returns a unit vector of the difference.
+
+        >>> Point(4, 6).direction_from(Point(1, 2))
+        (0.6000000000000001,0.8)
+        """
+        difference = self.difference(other_point)
+        difference.normalize()
+        return difference
+
     def translate(self, x, y):
         """
         >>> p = Point(0, 0)
@@ -76,10 +94,29 @@ class Point:
         """
         >>> p = Point(0, 0)
         >>> p.translate_by_point(Point(1, -2))
-        >>> (p.x, p.y)
-        (1, -2)
+        (1,-2)
         """
         self.translate(other.x, other.y)
+        return self
+
+    def scale(self, factor):
+        """
+        >>> Point(3, 4).scale(2)
+        (6,8)
+        >>> Point(3, 4).scale(0.5)
+        (1.5,2.0)
+        """
+        self.x *= factor
+        self.y *= factor
+        return self
+
+    def normalize(self):
+        """
+        >>> Point(3, 4).normalize()
+        (0.6000000000000001,0.8)
+        """
+        self.scale(1 / self.magnitude())
+        return self
 
     def __lt__(self, other):
         """

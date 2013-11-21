@@ -157,14 +157,21 @@ class PointQuadTreeViewer:
         self._update_mouse_collision_area_points()
 
     def _update_mouse_collision_area_points(self):
-        self._collision_area_points = self._get_points_in_collision_area_for_point(self._mouse_x, self._mouse_y)
+        self._collision_area_points = self._get_points_in_collision_area_for_coordinate(self._mouse_x, self._mouse_y)
 
-    def _get_points_in_collision_area_for_point(self, x, y):
+    def _get_points_in_collision_area_for_point(self, point):
         """
         @return iteratable(Point) the points in point's collision area
         """
+        points = self._get_points_in_collision_area_for_coordinate(point.x, point.y)
+        if point in points:
+            points.remove(point)
+        return points
+
+    def _get_points_in_collision_area_for_coordinate(self, x, y):
         region = self._get_collision_boundary(x, y)
-        return self._tree.query_points_in_region(region)
+        points = self._tree.query_points_in_region(region)
+        return points
 
     def _grow_collision_area(self, amount):
         new_collision_area_radius = max(self._COLLISION_AREA_RADIUS_MIN, self._collision_area_radius + amount)
@@ -204,7 +211,19 @@ class PointQuadTreeViewer:
 
     def _tick_point_movement(self):
         for point in self._get_points():
+            nearby_points = self._get_points_in_collision_area_for_point(point)
+            for other_point in nearby_points:
+                self._apply_flock_forces(point, other_point)
             self._move_point(point)
+
+    def _apply_flock_forces(self, point, other_point):
+        FLOCK_IDEAL_DISTANCE_SQUARED = 400
+        desired_distance_squared_delta = FLOCK_IDEAL_DISTANCE_SQUARED - point.distance_squared(other_point)
+        desired_distance_force = point.direction_from(other_point).scale(desired_distance_squared_delta * 0.0001)
+
+        total_force = Point(0, 0)
+        total_force.translate_by_point(desired_distance_force)
+        point.velocity.translate(total_force.x, total_force.y)
 
     def _move_point(self, point):
         translate_result = self._tree.translate_point(point, point.velocity.x, point.velocity.y)
@@ -340,7 +359,7 @@ class PointQuadTreeViewer:
 
     def _draw_collision_lines(self, color):
         for point in self._get_points():
-            collision_area_points = self._get_points_in_collision_area_for_point(point.x, point.y)
+            collision_area_points = self._get_points_in_collision_area_for_point(point)
             for other_point in collision_area_points:
                 pygame.draw.line(self.screen, color, (point.x, point.y), (other_point.x, other_point.y), self._POINT_RADIUS)
 

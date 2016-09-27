@@ -14,8 +14,8 @@ Dependencies
 
 Demo
 ----
-Run point_quad_tree_viewer.py.
+`python point_quad_tree_viewer.py`
 
 Performance Testing
 -------------------
-Run profile.py.
+`python profile.py`

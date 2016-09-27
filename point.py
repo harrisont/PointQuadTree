@@ -1,5 +1,6 @@
 import math
 
+
 class Point:
     def __init__(self, x, y):
         """
@@ -16,6 +17,8 @@ class Point:
         5.0
         >>> Point(-5, -12).magnitude()
         13.0
+        >>> Point(0, 0).magnitude()
+        0.0
         """
         return math.sqrt(self.magnitude_squared())
 
@@ -69,6 +72,9 @@ class Point:
 
         >>> Point(4, 6).direction_from(Point(1, 2))
         (0.6000000000000001,0.8)
+
+        >>> Point(0, 0).direction_from(Point(0, 0))
+        (0,0)
         """
         difference = self.difference(other_point)
         difference.normalize()
@@ -114,8 +120,13 @@ class Point:
         """
         >>> Point(3, 4).normalize()
         (0.6000000000000001,0.8)
+
+        >>> Point(0, 0).normalize()
+        (0,0)
         """
-        self.scale(1 / self.magnitude())
+        magnitude = self.magnitude()
+        if magnitude > 0:
+            self.scale(1 / magnitude)
         return self
 
     def __lt__(self, other):
@@ -141,6 +152,7 @@ class Point:
         '(1,2)'
         """
         return "({},{})".format(self.x, self.y)
+
 
 def run_tests():
     """

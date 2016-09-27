@@ -16,6 +16,8 @@ Demo
 ----
 `python point_quad_tree_viewer.py`
 
+![Screenshot](Screenshot.png)
+
 Performance Testing
 -------------------
 `python profile.py`

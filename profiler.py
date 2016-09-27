@@ -11,6 +11,7 @@ import time
 NUM_POINTS = 1000
 POINT_HALF_SIZE = 0.005
 
+
 class PointQuadTreeProfileRunner:
     def __init__(self, node_capacity):
         """
@@ -64,6 +65,7 @@ class PointQuadTreeProfileRunner:
     def _get_points(self):
         return self._tree.get_all_points()
 
+
 def run_profile_suite(seed, node_capacity):
     """
     @param seed Integer The random-number-generator seed
@@ -71,6 +73,7 @@ def run_profile_suite(seed, node_capacity):
     """
     runner = PointQuadTreeProfileRunner(node_capacity)
     runner.run(seed, NUM_POINTS)
+
 
 def profile(seed, node_capacity):
     """
@@ -84,6 +87,7 @@ def profile(seed, node_capacity):
     stats_restrictions = 'point_quad_tree.py|axis_aligned_bounding_box.py|point.py'
     pstats.Stats(profiler).strip_dirs().sort_stats('cumulative').print_stats(stats_restrictions, 0.5)
 
+
 def profile_node_capacities(seed, node_capacities):
     """
     @param seed Integer The random-number-generator seed
@@ -92,9 +96,11 @@ def profile_node_capacities(seed, node_capacities):
     for node_capacity in node_capacities:
         profile(seed, node_capacity)
 
+
 def main():
     seed = time.time()
     profile_node_capacities(seed, (1, 4, 20, 100, NUM_POINTS))
+
 
 def run_tests():
     """

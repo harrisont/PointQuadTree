@@ -9,7 +9,8 @@ See http://en.wikipedia.org/wiki/Quadtree#Point_quadtree for more information.
 Dependencies
 ------------
 * Python 3
-* Pygame
+* `pip install --requirement requirements.txt`
+    * Pygame
 
 Demo
 ----

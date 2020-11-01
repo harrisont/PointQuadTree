@@ -6,6 +6,9 @@ from point_quad_tree import PointQuadTree, AxisAlignedBoundingBox, Point
 
 import sys
 import random
+
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = 'hide'
 import pygame
 
 QUAD_TREE_NODE_CAPACITY = 20
